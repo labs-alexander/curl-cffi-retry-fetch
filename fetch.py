@@ -69,5 +69,5 @@ def create_session(proxy=None, impersonate="chrome"):
 	return session
 
 
-def handle_blocked(session=None):
+def handle_blocked():
 	pass
