@@ -6,9 +6,8 @@ import random
 import logging
 from curl_cffi.requests import Session
 
-logger = logging.getLogger(__name__)
 
-URL = "www.yoururl.com"
+logger = logging.getLogger(__name__)
 
 
 def apply_retry(function, max_tries=10):
@@ -27,8 +26,7 @@ def apply_retry(function, max_tries=10):
 			except exc.BlockedError as err:
 				last_err = err
 				logger.warning("Blocked: %s", err)
-				session = get_session(args, kwargs)
-				#handle_blocked(session)	
+				#handle_blocked(session) //  your block handling logic here	
 
 			except exc.UnknownError as err:
 				last_err = err
@@ -50,7 +48,7 @@ def apply_retry(function, max_tries=10):
 @apply_retry
 def fetch(url, session=None, params=None, headers=None):
 	if session is None:
-		session = Session()
+		session = create_session()
 	response = session.get(url=url, headers=headers, params=params)
 	classify_response(response)
 	return response
@@ -64,15 +62,12 @@ def classify_response(response):
 	raise exception_class(response)
 
 
-def get_session(args, kwargs):
-	if "session" in kwargs:
-		return kwargs.get("session")
-	session = next((s for s in args if isinstance(s, Session)), None)
-	return session
-
-
-def create_session(proxy=None):
+def create_session(proxy=None, impersonate="chrome"):
 	proxies = {"http": proxy, "https": proxy} if proxy else None
-	session = Session(impersonate="chrome", proxy=proxies)
+	session = Session(impersonate=impersonate, proxy=proxies)
 	session.proxy_url = proxy
 	return session
+
+
+def handle_blocked(session=None):
+	pass
